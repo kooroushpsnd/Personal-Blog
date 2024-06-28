@@ -4,7 +4,7 @@ const Blog = require('../models/blogModel')
 
 exports.createBlog = catchAsync(async(req ,res ,next) => {
     let date = new Date()
-    const blog = await Blog.findOne({day : date.getDate()})
+    const blog = await Blog.findOne({day : date.getDate() ,me : req.user.id})
     if(blog){
         return next(new AppError('you already have made a blog today please try to edit it' ,400)) 
     }
@@ -23,7 +23,7 @@ exports.createBlog = catchAsync(async(req ,res ,next) => {
 
 exports.editBlog = catchAsync(async(req ,res ,next) => {
     let date = new Date()
-    const old_blog = await Blog.findOne({day : date.getDate()})
+    const old_blog = await Blog.findOne({day : date.getDate() ,me : req.user.id})
     const blog = await Blog.findOneAndUpdate({day : date.getDate()} , {journey : old_blog.journey + ' ' + req.body.journey})
     if(!blog){
         return next(new AppError('no Blog founded' ,404)) 
@@ -36,20 +36,19 @@ exports.editBlog = catchAsync(async(req ,res ,next) => {
 })
 
 exports.deleteBlog = catchAsync(async(req ,res ,next) => {
-    const blog = await Blog.findByIdAndDelete(req.params.id)
+    const blog = await Blog.findOneAndDelete({_id : req.params.id ,me : req.user.id})
 
     if (!blog) {
       return next(new AppError('No document found with that ID', 404));
     }
 
     res.status(204).json({
-        status : 'deleted' ,
-        data : Null
+        status : 'success'
     })
 })
 
 exports.getAllBlogs = catchAsync(async(req ,res ,next) => {
-    const Blogs = await Blog.find({ me : req.user.id})
+    const Blogs = await Blog.find({me : req.user.id})
 
     if (Blogs.length == 0) {
         return next(new AppError('No document found with that ID', 404));
@@ -62,7 +61,7 @@ exports.getAllBlogs = catchAsync(async(req ,res ,next) => {
 })
 
 exports.getBlog = catchAsync(async(req ,res ,next) => {
-    const Blogs = await Blog.findone({_id : req.params.id})
+    const Blogs = await Blog.findOne({_id : req.params.id ,me : req.user.id})
 
     if (!Blogs) {
         return next(new AppError('No document found with that ID', 404));

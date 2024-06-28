@@ -9,7 +9,8 @@ const blogSchema = new mongoose.Schema({
     me : [{
         type : mongoose.Schema.ObjectId,
         ref : 'User'
-    }]
+    }],
+     __v: { type: Number, select: false}
 },
 {
   toJSON: { virtuals: true },
@@ -21,6 +22,8 @@ blogSchema.pre(/^find/ ,function(next){
         path:'me',
         select : '-__v -_id -role'
     })
+
+    this.select('-id')
 
     next()
 })

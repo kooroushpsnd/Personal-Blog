@@ -17,15 +17,12 @@ router
     .post(blogController.editBlog)
 
 router
-    .route('/deleteblog')
-    .post(blogController.deleteBlog)
-
-router
     .route('/')
     .get(blogController.getAllBlogs)
 
 router
     .route('/:id')
     .get(blogController.getBlog)
+    .delete(blogController.deleteBlog)
 
 module.exports = router
